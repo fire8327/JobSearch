@@ -6,6 +6,22 @@
             <FormKit v-model="user.password" validation="required|length:6" messages-class="text-[#E9556D] font-mono" type="password" placeholder="······" name="Пароль" outer-class="w-full lg:w-1/2" input-class="focus:outline-none px-4 py-2 bg-white rounded-xl border border-transparent w-full transition-all duration-500 focus:border-indigo-500 shadow-md"/>
         </div>
         <FormKit v-model="user.email" validation="required|email" messages-class="text-[#E9556D] font-mono" type="text" placeholder="Email" name="Email" outer-class="w-full md:w-2/3 lg:w-1/2" input-class="focus:outline-none px-4 py-2 bg-white rounded-xl border border-transparent w-full transition-all duration-500 focus:border-indigo-500 shadow-md"/>
+        <div class="flex max-md:flex-col items-center w-full md:w-2/3 lg:w-1/2 gap-4">
+            <div @click="user.role = 'applicant'" class="cursor-pointer flex items-center gap-2 p-4 rounded-lg transition-all duration-500 w-full md:w-1/2 border shadow-md" :class="[user.role === 'applicant' ? 'border-indigo-500 bg-indigo-50' : 'bg-white border-transparent hover:bg-gray-100']">
+                <Icon class="text-3xl text-indigo-500" name="ic:baseline-man"/>
+                <div class="flex flex-col gap-1">
+                    <p class="font-semibold">Соискатель</p>
+                    <p class="text-sm">Ищу работу</p>
+                </div>
+            </div>
+            <div @click="user.role = 'employer'" class="cursor-pointer flex items-center gap-2 p-4 rounded-lg transition-all duration-500 w-full md:w-1/2 border shadow-md" :class="[user.role === 'employer' ? 'border-indigo-500 bg-indigo-50' : 'bg-white border-transparent hover:bg-gray-100']">
+                <Icon class="text-3xl text-indigo-500" name="hugeicons:permanent-job"/>
+                <div class="flex flex-col gap-1">
+                    <p class="font-semibold">Работодатель</p>
+                    <p class="text-sm">Ищу сотрудников</p>
+                </div>
+            </div>
+        </div>
         <button :disabled="isRegDisabled" :class="{ 'opacity-50 cursor-not-allowed': isRegDisabled }" type="submit" class="px-4 py-2 border border-indigo-500 bg-indigo-500 text-white rounded-full w-[160px] text-center transition-all duration-500 hover:text-indigo-500 hover:bg-transparent">Регистрация</button>
         <div class="flex items-center justify-center gap-4 w-full md:w-2/3 lg:w-1/2 my-10">
             <div class="w-1/3 h-px bg-indigo-500"></div>  
@@ -28,7 +44,8 @@ useSeoMeta({
 const user = ref({
     login: "",
     password: "",
-    email: ""
+    email: "",
+    role: "applicant"
 })
 
 
