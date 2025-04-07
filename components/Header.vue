@@ -6,12 +6,12 @@
                 <span class="text-xl font-mono font-semibold">JobSearch</span>
             </NuxtLink>
             <div class="flex items-center gap-6 max-lg:hidden">
-                <form class="relative">
+                <!-- <form class="relative">
                     <input type="text" class="border border-indigo-200 rounded-xl transition-all duration-500 focus:border-indigo-500 focus:outline-none py-1.5 pl-4 pr-8">
                     <button class="flex absolute top-1/2 -translate-y-1/2 right-2">
                         <Icon class="text-3xl text-indigo-500" name="ic:round-search"/>
                     </button>
-                </form>
+                </form> -->
                 <NuxtLink to="/">Главная</NuxtLink>
                 <NuxtLink to="/">Вакансии</NuxtLink>
                 <NuxtLink to="/">Сервисы</NuxtLink>
