@@ -15,7 +15,7 @@
                 <NuxtLink to="/">Главная</NuxtLink>
                 <NuxtLink to="/">Вакансии</NuxtLink>
                 <NuxtLink to="/">Сервисы</NuxtLink>
-                <NuxtLink to="/" class="flex">
+                <NuxtLink to="/auth" class="flex">
                     <Icon class="text-3xl text-indigo-500" name="material-symbols:person"/>
                 </NuxtLink>
             </div>

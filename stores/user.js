@@ -15,25 +15,28 @@ export const useUserStore = defineStore("user", () => {
     const authenticated = useSynchronizedCookie('authenticated', false)
     const id = useSynchronizedCookie('id', null)
     const role = useSynchronizedCookie('role', null)
+    const profileCompleted = useSynchronizedCookie('profileCompleted', false);
 
     /* сообщения и роутер */
     const { showMessage } = useMessagesStore()
     const router = useRouter()
 
     // Функции для входа и выхода из аккаунта
-    function login(userId, userRole) {
+    function login(userId, userRole, isProfileCompleted) {
         authenticated.value = true
         id.value = userId
         role.value = userRole
+        profileCompleted.value = isProfileCompleted
     }
 
     function logout() {
         authenticated.value = false
         id.value = null
         role.value = null
+        profileCompleted.value = false
         showMessage("Успешный выход", true)
         router.push("/")
     }
 
-    return { authenticated, id, role, login, logout }
+    return { authenticated, id, role, profileCompleted, login, logout }
 })
