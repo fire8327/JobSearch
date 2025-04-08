@@ -30,12 +30,81 @@
 
 <script setup>
     /* проверка роли и создание сообщений */
-    const { role, profileCompleted } = useUserStore()
+    const { id, role, profileCompleted } = useUserStore()
     const { showMessage } = useMessagesStore()
 
 
-    /* данные профиля */
-    const isLoading = ref(false) //сохранение данных
+    /* подключение БД и роутера */
+    const supabase = useSupabaseClient()
+    const router = useRouter()
+
+
+    /* форма пользователя в зависимости от роли */
+    const userForm = ref(
+        role.value === 'applicant'
+        ? { surname: '', name: '', patronymic: '', phone: '' }
+        : role.value === 'employer'
+        ? { companyName: '', inn: '', address: '', desc: '', logo: '' }
+        : { name: '' }
+    )
+
+
+    /* данные профиля и их загрузка */
+    //сохранение данных
+    const isLoading = ref(false)
+
+    // отдельные поля для работодателя
+    const employerData = ref(null)
+    const logoFile = ref(null)
+
+    // отдельные поля для соискателя
+    const applicantData = ref(null)
+
+    // отдельны поля для администратора
+    const adminData = ref(null)
+    
+    // загрузка
+    const loadProfileData = async () => {
+        try {
+            if (role.value === 'applicant') {
+                const { data, error } = await supabase
+                .from('applicants')
+                .select()
+                .eq('user_id', id.value)
+                .single()
+
+                if (error) throw error
+
+                applicantData.value = data
+                if (data) userForm.value = { ...data }
+            } else if (role.value === 'employer') {
+                const { data, error } = await supabase
+                .from('employers')
+                .select()
+                .eq('user_id', id.value)
+                .single()
+
+                if (error) throw error
+
+                employerData.value = data
+                if (data) userForm.value = { ...data }
+            } else if (role.value === 'admin') {
+                const { data, error } = await supabase
+                .from('admins')
+                .select()
+                .eq('user_id', id.value)
+                .single()
+
+                if (error) throw error
+
+                adminData.value = data
+                if (data) userForm.value = { ...data }
+            }
+        } catch (error) {
+            showMessage('Ошибка при загрузке данных: ' + error.message, false)
+        }
+    }
+    onMounted(loadProfileData())
 
 
     /* редактирование данных */
@@ -55,25 +124,4 @@
         else if (role.value === 'admin' && adminData.value) userForm.value = { ...adminData.value }
         logoFile.value = null
     }
-
-    
-    /* форма пользователя в зависимости от роли */
-    const userForm = ref(
-        role.value === 'applicant'
-        ? { surname: '', name: '', patronymic: '', phone: '' }
-        : role.value === 'employer'
-        ? { companyName: '', inn: '', address: '', desc: '', logo: '' }
-        : { name: '' }
-    )
-
-    // отдельные поля для работодателя
-    const employerData = ref(null)
-    const logoFile = ref(null)
-
-
-    // отдельные поля для соискателя
-    const applicantData = ref(null)
-
-    // отдельны поля для администратора
-    const adminData = ref(null)
 </script>
