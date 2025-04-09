@@ -46,7 +46,7 @@ const authUser = async() => {
     isAuthDisabled.value = true
     const { data: users, error } = await supabase
     .from('users')
-    .select("*")
+    .select("*, applicants(*), employers(*)")
     .eq('login', user.value.login)
 
     if (!users[0]) {
@@ -63,8 +63,8 @@ const authUser = async() => {
 
     // Проверка заполненности профиля
     const profileCompleted = 
-        users.role === 'applicant' ? !!users.applicants?.user_id :
-        users.role === 'employer' ? !!users.employers?.user_id : false;
+        users[0].role === 'applicant' ? !!users[0].applicants[0]?.user_id :
+        users[0].role === 'employer' ? !!users[0].employers[0]?.user_id : false
 
 
     showMessage('Успешный вход!', true)

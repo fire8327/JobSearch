@@ -1,4 +1,4 @@
-// Вспомогательные функции для работы с cookies
+// вспомогательные функции для работы с cookies
 function useSynchronizedCookie(key, defaultValue) {
     const cookie = useCookie(key)
     const state = ref(cookie.value || defaultValue)
@@ -10,7 +10,7 @@ function useSynchronizedCookie(key, defaultValue) {
     return state
 }
 
-// Хранилище состояния пользователя
+// хранилище состояния пользователя
 export const useUserStore = defineStore("user", () => {
     const authenticated = useSynchronizedCookie('authenticated', false)
     const id = useSynchronizedCookie('id', null)
@@ -20,8 +20,9 @@ export const useUserStore = defineStore("user", () => {
     /* сообщения и роутер */
     const { showMessage } = useMessagesStore()
     const router = useRouter()
+    const supabase = useSupabaseClient()
 
-    // Функции для входа и выхода из аккаунта
+    // функции для входа и выхода из аккаунта
     function login(userId, userRole, isProfileCompleted) {
         authenticated.value = true
         id.value = userId
@@ -38,5 +39,19 @@ export const useUserStore = defineStore("user", () => {
         router.push("/")
     }
 
-    return { authenticated, id, role, profileCompleted, login, logout }
+    // обновление профиля
+    async function updateProfileCompleted() {
+        const { data, error } = await supabase
+          .from('users')
+          .select('role, applicants (user_id), employers (user_id)')
+          .eq('id', id.value)
+    
+        if (!error) {
+          profileCompleted.value =
+            data[0].role === 'applicant' ? !!data[0].applicants[0]?.user_id :
+            data[0].role === 'employer' ? !!data[0].employers[0]?.user_id : false
+        }
+      }
+
+    return { authenticated, id, role, profileCompleted, login, logout, updateProfileCompleted }
 })
