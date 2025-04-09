@@ -17,7 +17,7 @@
                 <FormKit v-model="userForm.inn" validation="required" messages-class="text-[#E9556D] font-mono" type="text" placeholder="ИНН" name="ИНН" outer-class="w-full lg:w-1/2" input-class="focus:outline-none px-4 py-2 bg-white rounded-xl border border-transparent w-full transition-all duration-500 focus:border-indigo-500 shadow-md"/>
             </div>
             <div class="relative w-full md:w-2/3 lg:w-1/2 group rounded-xl overflow-hidden" v-if="userForm.logo">
-                <img :src="getLogoUrl(userForm.logo)" alt="">
+                <img :src="getLogoUrl(userForm.logo)" alt="" class="object-cover object-center aspect-square w-full">
                 <button @click="removeLogoFile" class="absolute inset-0 bg-black/70 flex items-center justify-center transition-all duration-500 [@media(pointer:coarse)]:opacity-100 [@media(pointer:fine)]:opacity-0 group-hover:opacity-100">
                     <Icon class="text-3xl text-red-500" name="material-symbols:delete-outline"/>
                 </button>
@@ -42,6 +42,35 @@
             <FormKit v-model="privacyForm.email" validation="required|email" messages-class="text-[#E9556D] font-mono" type="email" placeholder="Email" name="Email" outer-class="w-full md:w-2/3 lg:w-1/2" input-class="focus:outline-none px-4 py-2 bg-white rounded-xl border border-transparent w-full transition-all duration-500 focus:border-indigo-500 shadow-md"/>
             <button :disabled="isLoading" :class="{ 'opacity-50 cursor-not-allowed': isLoading }" type="submit" class="px-4 py-2 border border-indigo-500 bg-indigo-500 text-white rounded-full w-[160px] text-center transition-all duration-500 hover:text-indigo-500 hover:bg-transparent">{{ isLoading ? 'Сохранение...' : 'Сохранить' }}</button>
         </FormKit>
+    </div>
+    <div v-if="profileCompleted && role !== 'admin'">
+        <div class="flex flex-col gap-6" v-if="role === 'employer'">
+            <p class="mainHeading">Вакансии</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" v-if="vacancies && vacancies.length > 0">
+                <div class="flex flex-col gap-4 p-4 rounded-xl shadow-lg bg-white">
+                    <button class="cursor-pointer self-end">
+                        <Icon class="text-3xl text-red-500" name="material-symbols:delete-outline"/>
+                    </button>
+                    <p>Название вакансии</p>
+                    <p class="line-clamp-2">Описание вакансии gfdlkjgdjkljkldgfkjldgf  jkdgfjkdgfjlkdfg jkdgfjdgfjkldgfklj  dgjkfkljdgfjkldgf</p>
+                    <p>Опыт</p>
+                    <p>График</p>
+                    <p>Статус</p>
+                </div>
+                <NuxtLink to="/profile/add-entry" class="flex items-center justify-center gap-4 w-full py-6 bg-white rounded-xl shadow-lg transition-all duration-500 hover:opacity-60">
+                    <Icon class="text-3xl" name="material-symbols:add-diamond-rounded"/>
+                    <span>Добавить</span>
+                </NuxtLink>
+            </div>
+            <div v-else class="flex flex-col w-full items-center gap-4 text-center">
+                <p class="text-2xl font-semibold font-mono">Вы пока ничего не опубликовали</p>
+                <NuxtLink to="/profile/add-entry" class="px-4 py-2 border border-indigo-500 bg-indigo-500 text-white rounded-full text-center transition-all duration-500 hover:text-indigo-500 hover:bg-transparent">Добавьте вакансию</NuxtLink>
+                <p class="font-semibold font-mono">, чтобы получить первые отклики</p>
+            </div>
+        </div>
+        <div class="flex flex-col gap-6" v-if="role === 'applicant'">
+            <p class="mainHeading">Резюме</p>
+        </div>
     </div>
     <div class="flex flex-col gap-6">
         <p class="mainHeading">Выход</p>
@@ -293,7 +322,21 @@
     }
 
 
+    /* вакансии */
+    const vacancies = ref()
+    const getVacanciesData = async () => {
+        const { data, error } = await supabase
+        .from('vacancies')
+        .select()
+
+        if(data) vacancies.value = { ...data[0] }
+    }
+
+
     /* первоначальная загрузка */
-    onMounted(loadProfileData)
-    onMounted(getUserData)
+    onMounted(() => {
+        loadProfileData()
+        getUserData()
+        getVacanciesData()
+    })
 </script>
