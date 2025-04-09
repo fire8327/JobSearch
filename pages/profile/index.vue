@@ -17,10 +17,13 @@
                 <FormKit v-model="userForm.inn" validation="required" messages-class="text-[#E9556D] font-mono" type="text" placeholder="ИНН" name="ИНН" outer-class="w-full lg:w-1/2" input-class="focus:outline-none px-4 py-2 bg-white rounded-xl border border-transparent w-full transition-all duration-500 focus:border-indigo-500 shadow-md"/>
             </div>
             {{ userForm.logo }}
-            <FormKit v-if="!userForm.logo" v-model="logoFile" accept="image/*" validation="required" messages-class="text-[#E9556D] font-mono" type="file" label="Логотип" name="Логотип" outer-class="w-full md:w-2/3 lg:w-1/2" input-class="focus:outline-none px-4 py-2 bg-white rounded-xl border border-transparent w-full transition-all duration-500 focus:border-indigo-500 shadow-md"/>
-            <div class="relative w-full md:w-2/3 lg:w-1/2" v-else>
-                <img :src="`https://unhdwdwoeepepaliejow.supabase.co/storage/v1/object/public/files/logos/${userForm.logo}`" alt="">
+            <div class="relative w-full md:w-2/3 lg:w-1/2 group rounded-xl overflow-hidden" v-if="userForm.logo">
+                <img :src="getLogoUrl(userForm.logo)" alt="">
+                <button @click="removeLogoFile" class="absolute inset-0 bg-black/70 flex items-center justify-center transition-all duration-500 [@media(pointer:coarse)]:opacity-100 [@media(pointer:fine)]:opacity-0 group-hover:opacity-100">
+                    <Icon class="text-3xl text-red-500" name="material-symbols:delete-outline"/>
+                </button>
             </div>
+            <FormKit v-else @change="(e) => { logoFile = e.target.files[0] }" accept="image/*" validation="required" messages-class="text-[#E9556D] font-mono" type="file" label="Логотип" name="Логотип" outer-class="w-full md:w-2/3 lg:w-1/2" input-class="focus:outline-none px-4 py-2 bg-white rounded-xl border border-transparent w-full transition-all duration-500 focus:border-indigo-500 shadow-md"/>
             <FormKit v-model="userForm.address" validation="required" messages-class="text-[#E9556D] font-mono" type="textarea" placeholder="Адрес компании" name="Адрес компании" outer-class="w-full md:w-2/3 lg:w-1/2" input-class="focus:outline-none px-4 py-2 bg-white rounded-xl border border-transparent w-full transition-all duration-500 focus:border-indigo-500 shadow-md"/>
             <FormKit v-model="userForm.desc" validation="required" messages-class="text-[#E9556D] font-mono" type="textarea" placeholder="Описание компании" name="Описание компании" outer-class="w-full md:w-2/3 lg:w-1/2" input-class="focus:outline-none px-4 py-2 bg-white rounded-xl border border-transparent w-full transition-all duration-500 focus:border-indigo-500 shadow-md"/>
             <button :disabled="isLoading" :class="{ 'opacity-50 cursor-not-allowed': isLoading }" type="submit" class="px-4 py-2 border border-indigo-500 bg-indigo-500 text-white rounded-full w-[160px] text-center transition-all duration-500 hover:text-indigo-500 hover:bg-transparent">{{ isLoading ? 'Сохранение...' : 'Сохранить' }}</button>
@@ -105,6 +108,12 @@
     }
 
 
+    /* получение логотипа */
+    const getLogoUrl = (fileName) => {
+        const { data } = supabase.storage.from('files/logos').getPublicUrl(fileName)
+        return data.publicUrl
+    }
+
 
     /* сохранение профиля */
     const saveProfile = async () => {
@@ -156,19 +165,21 @@
     const saveEmployerProfile = async () => {
         let logoFileName = userForm.value.logo
 
-        if (logoFile.value && logoFile.value.length > 0) {
-           /*  if(userForm.value.logo) {
-                await removeLogoFile()
-            } */
+        if (logoFile.value) {
+            const file = logoFile.value
+            const extension = file.name.split('.').pop()
+            const fileName = `${file.name.split('.')[0]}-${Date.now()}.${extension}`
 
-            const file = logoFile.value[0]
-            const fileName = `${userId}/${Date.now()}-${file.name}`
+                
             const { error: uploadError } = await supabase.storage
-                .from('files/logos')
-                .upload(fileName, file)
+            .from('files/logos')
+            .upload(`${fileName}`, file)
+
             if (uploadError) throw uploadError
+
             logoFileName = fileName
             userForm.value.logo = fileName
+
         }
 
         if (!profileCompleted) {
@@ -220,19 +231,22 @@
     /* удаление логотипа */
     const removeLogoFile = async () => {
         if (!userForm.value.logo) return
-        try {
-            const { error } = await supabase.storage
-                .from('files/logos')
-                .remove([userForm.value.logo])
-            if (error) throw error
+
+        const { error: removeError } = await supabase.storage
+        .from('files')
+        .remove([`logos/${userForm.value.logo}`])
+
+        // обновляем запись в базе данных
+        const { error: updateError } = await supabase
+        .from('employers') 
+        .update({ logo: null })
+        .eq('user_id', userId)
+
+        if(!updateError && !removeError) {
             userForm.value.logo = ''
-            await supabase
-                .from('employers')
-                .update({ logo: null })
-                .eq('user_id', userId)
             showMessage('Логотип удалён!', true)
-        } catch (error) {
-            showMessage('Ошибка при удалении логотипа: ' + error.message, false)
+        } else {
+            showMessage('Произошла ошибка!', false)
         }
     }
 
