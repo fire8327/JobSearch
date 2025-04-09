@@ -33,6 +33,17 @@
         </FormKit>
     </div>
     <div class="flex flex-col gap-6">
+        <p class="mainHeading">Настройки приватности</p>
+        <FormKit :form-attrs="{ autocomplete: 'off' }" @submit="updPrivacy" type="form" :actions="false" messages-class="hidden" form-class="flex flex-col gap-6 items-center justify-center">
+            <div class="flex items-center lg:items-start gap-4 max-lg:flex-col w-full md:w-2/3 lg:w-1/2">
+                <FormKit v-model="privacyForm.login" validation="required" messages-class="text-[#E9556D] font-mono" type="text" placeholder="Логин" name="Логин" outer-class="w-full lg:w-1/2" input-class="focus:outline-none px-4 py-2 bg-white rounded-xl border border-transparent w-full transition-all duration-500 focus:border-indigo-500 shadow-md"/>
+                <FormKit v-model="privacyForm.password" validation="required" messages-class="text-[#E9556D] font-mono" type="password" placeholder="Пароль" name="Пароль" outer-class="w-full lg:w-1/2" input-class="focus:outline-none px-4 py-2 bg-white rounded-xl border border-transparent w-full transition-all duration-500 focus:border-indigo-500 shadow-md"/>
+            </div>
+            <FormKit v-model="privacyForm.email" validation="required|email" messages-class="text-[#E9556D] font-mono" type="email" placeholder="Email" name="Email" outer-class="w-full md:w-2/3 lg:w-1/2" input-class="focus:outline-none px-4 py-2 bg-white rounded-xl border border-transparent w-full transition-all duration-500 focus:border-indigo-500 shadow-md"/>
+            <button :disabled="isLoading" :class="{ 'opacity-50 cursor-not-allowed': isLoading }" type="submit" class="px-4 py-2 border border-indigo-500 bg-indigo-500 text-white rounded-full w-[160px] text-center transition-all duration-500 hover:text-indigo-500 hover:bg-transparent">{{ isLoading ? 'Сохранение...' : 'Сохранить' }}</button>
+        </FormKit>
+    </div>
+    <div class="flex flex-col gap-6">
         <p class="mainHeading">Выход</p>
         <button @click="logout" class="px-4 py-2 border border-indigo-500 bg-indigo-500 text-white rounded-full w-[160px] text-center transition-all duration-500 hover:text-indigo-500 hover:bg-transparent">Выйти</button>
     </div>
@@ -249,5 +260,40 @@
         }
     }
 
+
+    /* настройки приватности */
+    const privacyForm = ref({
+        login: '',
+        password: '',
+        email: ''
+    })
+
+    //получение данных
+    const getUserData = async () => {
+        const { data:users, error:usersError } = await supabase
+        .from('users')
+        .select('login, password, email')
+        .eq('id', userId)
+
+        if(users) privacyForm.value = { ...users[0] }
+    }
+
+    // сохранение данных
+    const updPrivacy = async() => {        
+        const { error } = await supabase
+        .from('users')
+        .update(privacyForm.value)
+        .eq('id', userId)
+
+        if(!error) {
+            showMessage('Данные обновлены!', true)
+        } else {
+            showMessage('Произошла ошибка!', false)
+        }
+    }
+
+
+    /* первоначальная загрузка */
     onMounted(loadProfileData)
+    onMounted(getUserData)
 </script>
