@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col gap-6">
         <p class="mainHeading">Данные профиля</p>
-        <p v-if="!profileCompleted" class="opacity-50 text-base">* закончите заполнения вашего профиля ниже</p>
+        <p v-if="!userStore.profileCompleted" class="opacity-50 text-base">* закончите заполнения вашего профиля ниже</p>
         <FormKit @submit="saveProfile" v-if="role === 'applicant'" type="form" :actions="false" messages-class="hidden" form-class="flex flex-col gap-6 items-center justify-center">
             <div class="flex items-center lg:items-start gap-4 max-lg:flex-col w-full md:w-2/3 lg:w-1/2">
                 <FormKit v-model="userForm.surname" validation="required" messages-class="text-[#E9556D] font-mono" type="text" placeholder="Фамилия" name="Фамилия" outer-class="w-full lg:w-1/3" input-class="focus:outline-none px-4 py-2 bg-white rounded-xl border border-transparent w-full transition-all duration-500 focus:border-indigo-500 shadow-md"/>
@@ -43,7 +43,7 @@
             <button :disabled="isLoading" :class="{ 'opacity-50 cursor-not-allowed': isLoading }" type="submit" class="px-4 py-2 border border-indigo-500 bg-indigo-500 text-white rounded-full w-[160px] text-center transition-all duration-500 hover:text-indigo-500 hover:bg-transparent">{{ isLoading ? 'Сохранение...' : 'Сохранить' }}</button>
         </FormKit>
     </div>
-    <div v-if="profileCompleted && role !== 'admin'">
+    <div v-if="userStore.profileCompleted && role !== 'admin'">
         <div class="flex flex-col gap-6" v-if="role === 'employer'">
             <p class="mainHeading">Вакансии</p>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" v-if="vacancies && vacancies.length > 0">
@@ -70,6 +70,26 @@
         </div>
         <div class="flex flex-col gap-6" v-if="role === 'applicant'">
             <p class="mainHeading">Резюме</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" v-if="resumes && resumes.length > 0">
+                <div class="flex flex-col gap-4 p-4 rounded-xl shadow-lg bg-white" v-for="resume in resumes">
+                    <button type="button" @click="deleteResume(resume.id)" class="cursor-pointer self-end">
+                        <Icon class="text-3xl text-red-500" name="material-symbols:delete-outline"/>
+                    </button>
+                    <p>{{ resume.name }}</p>
+                    <p><span class="font-semibold font-mono">Опыт: </span>{{ resume.exp }}</p>
+                    <p><span class="font-semibold font-mono">Образование: </span>{{ resume.education }}</p>
+                    <p><span class="font-semibold font-mono">Статус: </span>{{ resume.status }}</p>
+                </div>
+                <NuxtLink to="/profile/add-entry" class="flex items-center justify-center gap-4 w-full py-6 bg-white rounded-xl shadow-lg transition-all duration-500 hover:opacity-60">
+                    <Icon class="text-3xl" name="material-symbols:add-diamond-rounded"/>
+                    <span>Добавить</span>
+                </NuxtLink>
+            </div>
+            <div v-else class="flex flex-col w-full items-center gap-4 text-center">
+                <p class="text-2xl font-semibold font-mono">Вы пока ничего не опубликовали</p>
+                <NuxtLink to="/profile/add-entry" class="px-4 py-2 border border-indigo-500 bg-indigo-500 text-white rounded-full text-center transition-all duration-500 hover:text-indigo-500 hover:bg-transparent">Добавьте резюме</NuxtLink>
+                <p class="font-semibold font-mono">, чтобы отправить первые отклики</p>
+            </div>
         </div>
     </div>
     <div class="flex flex-col gap-6">
@@ -80,7 +100,8 @@
 
 <script setup>
     /* проверка роли и создание сообщений */
-    const { id:userId, role, profileCompleted, updateProfileCompleted, logout } = useUserStore()
+    const userStore = useUserStore()
+    const { id:userId, role, updateProfileCompleted, logout } = useUserStore()
     const { showMessage } = useMessagesStore()
 
 
@@ -167,7 +188,8 @@
                 await saveAdminProfile()
             }
             await updateProfileCompleted()
-            showMessage(profileCompleted ? 'Профиль обновлён!' : 'Профиль создан!', true)
+            await loadProfileData()
+            showMessage(userStore.profileCompleted ? 'Профиль обновлён!' : 'Профиль создан!', true)
         } catch (error) {
             showMessage('Ошибка при сохранении: ' + error.message, false)
         } finally {
@@ -177,7 +199,7 @@
 
     // соискатель 
     const saveApplicantProfile = async () => {
-        if (!profileCompleted) {
+        if (!userStore.profileCompleted) {
             const { error } = await supabase.from('applicants').insert({
                 user_id: userId,
                 surname: userForm.value.surname,
@@ -207,7 +229,7 @@
         if (logoFile.value) {
             const file = logoFile.value
             const extension = file.name.split('.').pop()
-            const fileName = `${file.name.split('.')[0]}-${Date.now()}.${extension}`
+            const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 7)}.${extension}`
 
                 
             const { error: uploadError } = await supabase.storage
@@ -221,7 +243,7 @@
 
         }
 
-        if (!profileCompleted) {
+        if (!userStore.profileCompleted) {
             const { error } = await supabase.from('employers').insert({
                 user_id: userId,
                 companyName: userForm.value.companyName,
@@ -249,7 +271,7 @@
 
     // администратор
     const saveAdminProfile = async () => {
-        if (!profileCompleted) {
+        if (!userStore.profileCompleted) {
             const { error } = await supabase.from('admins').insert({
                 user_id: userId,
                 name: userForm.value.name,
@@ -373,11 +395,40 @@
     }
 
 
+    /* резюме */
+    const resumes = ref()
+    const getResumesData = async () => {
+        const { data, error } = await supabase
+        .from('resumes')
+        .select()
+        .eq('applicant_id', mainId.value)
+        .order('id', { ascending: true })
+        
+        if(data) resumes.value = data
+    }
+
+    //удаление вакаснии 
+    const deleteResume = async (vacancyId) => {
+        const { error } = await supabase
+        .from('resumes')
+        .delete()
+        .eq('id', vacancyId)
+
+        if(!error) {
+            showMessage('Резюме удалено!', true)
+            await getResumesData()
+        } else {
+            showMessage('Произошла ошибка!', false)
+        }
+    }
+
+
     /* первоначальная загрузка */
     onMounted(async () => {
         loadProfileData()
         getUserData()
         await fetchProfileData(role, userId)
         await getVacanciesData()
+        await getResumesData()
     })
 </script>

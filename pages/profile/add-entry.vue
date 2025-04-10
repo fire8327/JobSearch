@@ -121,7 +121,7 @@
     /* логика навыков */
     const skillsInput = ref('')
     const updateSkills = () => {
-        const skillsText = skillsInput.value.trim()
+        const skillsText = skillsInput.value.toLocaleLowerCase().trim()
         if (!skillsText) {
             mainForm.value.skills = []
             return
@@ -158,7 +158,7 @@
         if (resumeFile.value) {
             const file = resumeFile.value
             const extension = file.name.split('.').pop()
-            const fileName = `${file.name.split('.')[0]}-${Date.now()}.${extension}`
+            const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 7)}.${extension}`
 
                 
             const { error: uploadError } = await supabase.storage
