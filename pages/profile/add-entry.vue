@@ -37,7 +37,6 @@
             </template>
             <button type="submit" class="px-4 py-2 border border-indigo-500 bg-indigo-500 text-white rounded-full w-[160px] text-center transition-all duration-500 hover:text-indigo-500 hover:bg-transparent">Добавить</button>
         </FormKit>
-        {{ mainForm }}
     </div>
 </template>
 

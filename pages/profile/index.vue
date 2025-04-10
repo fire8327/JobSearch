@@ -48,7 +48,7 @@
             <p class="mainHeading">Вакансии</p>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" v-if="vacancies && vacancies.length > 0">
                 <div class="flex flex-col gap-4 p-4 rounded-xl shadow-lg bg-white" v-for="vacancy in vacancies">
-                    <button class="cursor-pointer self-end">
+                    <button type="button" @click="deleteVacancy(vacancy.id)" class="cursor-pointer self-end">
                         <Icon class="text-3xl text-red-500" name="material-symbols:delete-outline"/>
                     </button>
                     <p>{{ vacancy.name }}</p>
@@ -355,6 +355,21 @@
         .order('id', { ascending: true })
         
         if(data) vacancies.value = data
+    }
+
+    //удаление вакаснии 
+    const deleteVacancy = async (vacancyId) => {
+        const { error } = await supabase
+        .from('vacancies')
+        .delete()
+        .eq('id', vacancyId)
+
+        if(!error) {
+            showMessage('Вакансия удалена!', true)
+            await getVacanciesData()
+        } else {
+            showMessage('Произошла ошибка!', false)
+        }
     }
 
 
