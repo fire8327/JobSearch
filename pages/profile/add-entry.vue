@@ -3,8 +3,8 @@
         <p class="mainHeading" v-if="role === 'employer'">Добавление вакансии</p>
         <p class="mainHeading" v-if="role === 'applicant'">Добавление резюме</p>
         <FormKit @submit="addEntry" type="form" :actions="false" messages-class="hidden" form-class="flex flex-col gap-6 items-center justify-center">
-            <!-- для компании -->
-            <template v-if="role === 'employer'">
+            <!-- для соискателя -->
+            <template v-if="role === 'applicant'">
                 <FormKit v-model="mainForm.name" validation="required" messages-class="text-[#E9556D] font-mono" type="text" placeholder="Желаемая должность" name="Желаемая должность" outer-class="w-full md:w-2/3 lg:w-1/2" input-class="focus:outline-none px-4 py-2 bg-white rounded-xl border border-transparent w-full transition-all duration-500 focus:border-indigo-500 shadow-md"/>
                 <div class="flex items-center lg:items-start gap-4 max-lg:flex-col w-full md:w-2/3 lg:w-1/2">
                     <FormKit v-model="mainForm.exp" validation="required" messages-class="text-[#E9556D] font-mono" type="select" :options="['Без опыта', 'До 1 года', '1-3 года', '3-5 лет', 'Более 5 лет']" placeholder="Опыт работы" name="Опыт работы" outer-class="w-full lg:w-1/2" input-class="focus:outline-none px-4 py-2 bg-white rounded-xl border border-transparent w-full transition-all duration-500 focus:border-indigo-500 shadow-md"/>
@@ -23,6 +23,7 @@
                     </div>    
                 </div>
             </template>
+            <!-- для компании -->
             <template v-if="role === 'employer'">
                 <FormKit v-model="mainForm.name" validation="required" messages-class="text-[#E9556D] font-mono" type="text" placeholder="Наименование вакансии" name="Наименование вакансии" outer-class="w-full md:w-2/3 lg:w-1/2" input-class="focus:outline-none px-4 py-2 bg-white rounded-xl border border-transparent w-full transition-all duration-500 focus:border-indigo-500 shadow-md"/>
                 <div class="flex items-center lg:items-start gap-4 max-lg:flex-col w-full md:w-2/3 lg:w-1/2">
@@ -36,6 +37,7 @@
             </template>
             <button type="submit" class="px-4 py-2 border border-indigo-500 bg-indigo-500 text-white rounded-full w-[160px] text-center transition-all duration-500 hover:text-indigo-500 hover:bg-transparent">Добавить</button>
         </FormKit>
+        {{ mainForm }}
     </div>
 </template>
 
@@ -69,9 +71,7 @@
         if (data) {
             mainId.value = data.id
         }
-    }
-    // вызов функции
-    fetchProfileData(role, userId)
+    }    
 
 
     /* создание формы */
@@ -109,9 +109,13 @@
         skillsInput.value = ''
     }
 
-    // инициализация формы
-    onMounted(() => {
-        initForm()
+    // слежение за изменением id
+    watch(mainId, (newId) => {
+        if (role === 'employer') {
+            mainForm.value.employer_id = newId;
+        } else if (role === 'applicant') {
+            mainForm.value.applicant_id = newId;
+        }
     })
 
 
@@ -185,4 +189,11 @@
             showMessage('Произошла ошибка!', false)
         }
     }
+
+
+    /* инициализация данных */
+    onMounted(() => {
+        fetchProfileData(role, userId)
+        initForm()
+    })
 </script>
