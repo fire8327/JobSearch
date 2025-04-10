@@ -47,15 +47,15 @@
         <div class="flex flex-col gap-6" v-if="role === 'employer'">
             <p class="mainHeading">Вакансии</p>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" v-if="vacancies && vacancies.length > 0">
-                <div class="flex flex-col gap-4 p-4 rounded-xl shadow-lg bg-white">
+                <div class="flex flex-col gap-4 p-4 rounded-xl shadow-lg bg-white" v-for="vacancy in vacancies">
                     <button class="cursor-pointer self-end">
                         <Icon class="text-3xl text-red-500" name="material-symbols:delete-outline"/>
                     </button>
-                    <p>Название вакансии</p>
-                    <p class="line-clamp-2">Описание вакансии gfdlkjgdjkljkldgfkjldgf  jkdgfjkdgfjlkdfg jkdgfjdgfjkldgfklj  dgjkfkljdgfjkldgf</p>
-                    <p>Опыт</p>
-                    <p>График</p>
-                    <p>Статус</p>
+                    <p>{{ vacancy.name }}</p>
+                    <p class="line-clamp-2">{{ vacancy.desc }}</p>
+                    <p><span class="font-semibold font-mono">Опыт: </span>{{ vacancy.exp }}</p>
+                    <p><span class="font-semibold font-mono">График: </span>{{ vacancy.schedule }}</p>
+                    <p><span class="font-semibold font-mono">Статус: </span>{{ vacancy.status }}</p>
                 </div>
                 <NuxtLink to="/profile/add-entry" class="flex items-center justify-center gap-4 w-full py-6 bg-white rounded-xl shadow-lg transition-all duration-500 hover:opacity-60">
                     <Icon class="text-3xl" name="material-symbols:add-diamond-rounded"/>
@@ -322,21 +322,47 @@
     }
 
 
+    /* подключение к бд и получение id, который отправил форму */
+    const mainId = ref() // id в зависимости от роли
+    const roleTableMap = { // таблица в зависимости от роли
+        employer: 'employers',
+        applicant: 'applicants'
+    }
+    
+    // функция получения данных
+    const fetchProfileData = async(userRole, userId) => {
+        const table = roleTableMap[userRole]
+
+        const { data, error } = await supabase
+        .from(table)
+        .select()
+        .eq('user_id', userId)
+        .single()
+
+        if (data) {
+            mainId.value = data.id
+        }
+    }    
+
+
     /* вакансии */
     const vacancies = ref()
     const getVacanciesData = async () => {
         const { data, error } = await supabase
         .from('vacancies')
         .select()
-
-        if(data) vacancies.value = { ...data[0] }
+        .eq('employer_id', mainId.value)
+        .order('id', { ascending: true })
+        
+        if(data) vacancies.value = data
     }
 
 
     /* первоначальная загрузка */
-    onMounted(() => {
+    onMounted(async () => {
         loadProfileData()
         getUserData()
-        getVacanciesData()
+        await fetchProfileData(role, userId)
+        await getVacanciesData()
     })
 </script>
