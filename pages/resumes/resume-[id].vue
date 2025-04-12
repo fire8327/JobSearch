@@ -12,7 +12,7 @@
         <div class="flex flex-col gap-4">
             <p class="text-2xl font-semibold font-mono">Навыки</p>
             <div class="w-full lg:w-1/3 flex flex-wrap gap-2">
-                <p class="py-1.5 px-4 rounded-xl bg-indigo-500 text-white" v-for="skill in resume?.skills">{{ skill }}</p>
+                <p class="px-6 rounded-xl bg-indigo-500 text-white" v-for="skill in resume?.skills">{{ skill }}</p>
             </div>
         </div>
         <div class="flex flex-col gap-4">
