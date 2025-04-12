@@ -1,10 +1,16 @@
 <template>
     <div class="flex flex-col gap-6">
         <p class="mainHeading">Фильтрация</p>
-        <FormKit v-model="searchQuery.name" messages-class="text-[#E9556D] font-mono" type="text"
-            placeholder="Наименование вакансии" name="Наименование вакансии" outer-class="w-full"
-            input-class="focus:outline-none px-4 py-2 bg-white rounded-xl border border-transparent w-full transition-all duration-500 focus:border-indigo-500 shadow-md" />
-
+        <div class="flex flex-col items-center gap-6 w-full">
+            <FormKit v-model="searchQuery.name" type="text"
+                placeholder="Наименование вакансии" name="Наименование вакансии" outer-class="w-full md:w-2/3 lg:w-1/2"
+                input-class="focus:outline-none px-4 py-2 bg-white rounded-xl border border-transparent w-full transition-all duration-500 focus:border-indigo-500 shadow-md" />
+            <div class="flex items-center lg:items-start gap-4 max-lg:flex-col w-full md:w-2/3 lg:w-1/2">
+                <FormKit v-model="searchQuery.exp" type="select" :options="['Без опыта', 'До 1 года', '1-3 года', '3-5 лет', 'Более 5 лет']" placeholder="Опыт работы" name="Опыт работы" outer-class="w-full lg:w-1/3" input-class="focus:outline-none px-4 py-2 bg-white rounded-xl border border-transparent w-full transition-all duration-500 focus:border-indigo-500 shadow-md"/>
+                <FormKit v-model="searchQuery.schedule" validation="required" messages-class="text-[#E9556D] font-mono" type="select" :options="['5/2', '6/1', '2/2', '1/2', '1/3', 'Неделя через неделю', 'Дежурства', 'Гибкий график']" placeholder="График" name="График" outer-class="w-full md:w-2/3 lg:w-1/2" input-class="focus:outline-none px-4 py-2 bg-white rounded-xl border border-transparent w-full transition-all duration-500 focus:border-indigo-500 shadow-md"/>
+                <FormKit v-model="searchQuery.format" type="select" :options="['Удалённый', 'Офис', 'Гибрид', 'Вахта', 'Проектный']" placeholder="Формат" name="Формат" outer-class="w-full lg:w-1/3" input-class="focus:outline-none px-4 py-2 bg-white rounded-xl border border-transparent w-full transition-all duration-500 focus:border-indigo-500 shadow-md"/>
+            </div>
+        </div>
     </div>
     <div class="flex flex-col gap-6" v-if="vacancies && vacancies.length > 0">
         <p class="mainHeading">Список вакансий</p>
@@ -16,6 +22,7 @@
                 <p>{{ vacancy.name }}</p>
                 <p class="line-clamp-2">{{ vacancy.desc }}</p>
                 <p><span class="font-semibold font-mono">Опыт: </span>{{ vacancy.exp }}</p>
+                <p><span class="font-semibold font-mono">Формат: </span>{{ vacancy.format }}</p>
                 <p><span class="font-semibold font-mono">График: </span>{{ vacancy.schedule }}</p>
                 <p><span class="font-semibold font-mono">Зарплата: </span>{{ vacancy.salary.toLocaleString() }} ₽</p>
                 <button @click="sendResponse(vacancy.id)"
@@ -78,7 +85,7 @@ const responses = ref([])
 const searchQuery = ref({
     name: '',
     exp: '',
-    salary: '',
+    schedule: '',
     format: ''
 })
 
@@ -87,7 +94,7 @@ const fetchVacancies = async () => {
     if (searchQuery.value.name) query = query.ilike('name', `%${searchQuery.value.name}%`)
     if (searchQuery.value.exp) query = query.eq('exp', searchQuery.value.exp)
     if (searchQuery.value.format) query = query.eq('format', searchQuery.value.format)
-    if (searchQuery.value.salary) query = query.qte('salary', searchQuery.value.salary)
+    if (searchQuery.value.schedule) query = query.eq('schedule', searchQuery.value.schedule)
 
     const { data } = await query
     vacancies.value = data || []
