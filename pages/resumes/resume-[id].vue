@@ -20,7 +20,8 @@
             <p><span class="font-semibold font-mono">ФИО:</span> {{ resume?.applicants.surname }} {{
                 resume?.applicants.name }} {{ resume?.applicants.patronymic }}</p>
             <p><span class="font-semibold font-mono">Номер телефона:</span> {{ resume?.applicants.phone }}</p>
-            <NuxtLink :to="`https://unhdwdwoeepepaliejow.supabase.co/storage/v1/object/public/files/resumes/${resume?.resume}`" download target="_blank" class="font-semibold text-2xl font-mono w-fit flex flex-col after:w-0 after:h-[3px] after:rounded-full after:bg-[#141414]/80 after:transition-all after:duration-500 hover:after:w-full">Скачать резюме</NuxtLink> 
+            <a v-if="resume?.resume" :href="`https://unhdwdwoeepepaliejow.supabase.co/storage/v1/object/public/files/resumes/${resume?.resume}`" download="Резюме соискателя" target="_blank" class="font-semibold text-2xl font-mono w-fit flex flex-col after:w-0 after:h-[3px] after:rounded-full after:bg-[#141414]/80 after:transition-all after:duration-500 hover:after:w-full">Скачать резюме</a> 
+            <p v-else class="text-2xl font-semibold font-mono">Ошибка: резюме не загружено</p>
         </div>
         <button @click="sendOffer(resume?.id)"
             :class="[isOffered(resume?.id) ? 'opacity-50' : 'cursor-pointer hover:bg-transparent hover:text-indigo-500']"
