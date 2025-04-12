@@ -11,7 +11,10 @@
             <p><span class="font-semibold">Формат:</span> {{ vacancy?.format }}</p>
         </div>
         <div class="flex flex-col gap-4">
-            <p class="text-2xl font-mono font-semibold">Описание компании</p>
+            <div class="flex items-center gap-2">
+                <img :src="`https://unhdwdwoeepepaliejow.supabase.co/storage/v1/object/public/files/logos/${vacancy?.employers?.logo}`" alt="" class="aspect-square object-cover object-center w-10 rounded-full">
+                <p>{{ vacancy?.employers?.companyName }}</p>
+            </div>
             <p>{{ vacancy?.employers.desc }}</p>
         </div>
         <div class="flex flex-col gap-4">

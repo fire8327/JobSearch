@@ -14,7 +14,7 @@
                 </form> -->
                 <NuxtLink to="/">Главная</NuxtLink>
                 <NuxtLink to="/vacancies" v-if="userStore.role === 'applicant'">Вакансии</NuxtLink>
-                <NuxtLink to="/resumes" v-if="userStore.role === 'employer'">Резюму</NuxtLink>
+                <NuxtLink to="/resumes" v-if="userStore.role === 'employer'">Резюме</NuxtLink>
                 <NuxtLink to="/">Сервисы</NuxtLink>
                 <NuxtLink to="/auth" class="flex">
                     <Icon class="text-3xl text-indigo-500" name="material-symbols:person"/>
