@@ -13,7 +13,8 @@
                     </button>
                 </form> -->
                 <NuxtLink to="/">Главная</NuxtLink>
-                <NuxtLink to="/">Вакансии</NuxtLink>
+                <NuxtLink to="/vacancies" v-if="userStore.role === 'applicant'">Вакансии</NuxtLink>
+                <NuxtLink to="/resumes" v-if="userStore.role === 'employer'">Резюму</NuxtLink>
                 <NuxtLink to="/">Сервисы</NuxtLink>
                 <NuxtLink to="/auth" class="flex">
                     <Icon class="text-3xl text-indigo-500" name="material-symbols:person"/>
@@ -33,4 +34,8 @@
 <script setup>
 /* создание сообщений */
 const { messageTitle, messageType } = storeToRefs(useMessagesStore())
+
+
+/* проверка роли */
+const userStore = useUserStore()
 </script>

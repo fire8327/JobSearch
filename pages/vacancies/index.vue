@@ -1,0 +1,114 @@
+<template>
+    <div>
+        <div class="flex flex-col gap-6">
+            <p class="mainHeading">Список вакансий</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="flex flex-col gap-4 p-4 rounded-xl shadow-lg bg-white" v-for="vacancy in vacancies">
+                    <NuxtLink to="/" class="cursor-pointer self-end transition-all duration-500 hover:scale-110">
+                        <Icon class="text-3xl text-indigo-500" name="material-symbols:eye-tracking-rounded"/>
+                    </NuxtLink>
+                    <p>{{ vacancy.name }}</p>
+                    <p class="line-clamp-2">{{ vacancy.desc }}</p>
+                    <p><span class="font-semibold font-mono">Опыт: </span>{{ vacancy.exp }}</p>
+                    <p><span class="font-semibold font-mono">График: </span>{{ vacancy.schedule }}</p>
+                    <p><span class="font-semibold font-mono">Зарплата: </span>{{ vacancy.salary.toLocaleString() }} ₽</p>
+                    <button @click="sendResponse(vacancy.id)" :class="[isResponded(vacancy.id) ? 'opacity-50' : 'cursor-pointer hover:bg-transparent hover:text-indigo-500']" :disabled="isResponded(vacancy.id)" class="w-full py-1.5 px-4 rounded-xl border border-indigo-500 bg-indigo-500 text-white transition-all duration-500">{{ isResponded(vacancy.id) ? 'Отклик отправлен' : 'Откликнуться' }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script setup>
+/* подключение сообщений */
+const { showMessage } = useMessagesStore()
+
+
+/* подключение бд и хранилищ */
+const supabase = useSupabaseClient()
+const userStore = useUserStore()
+const { id: userId, role } = userStore
+
+
+/* определени id отправившего */
+const mainId = ref() // id в зависимости от роли
+const roleTableMap = { // таблица в зависимости от роли
+    employer: 'employers',
+    applicant: 'applicants'
+}
+
+const fetchProfileData = async (userRole, userId) => {
+    const table = roleTableMap[userRole]
+
+    const { data, error } = await supabase
+        .from(table)
+        .select()
+        .eq('user_id', userId)
+        .single()
+
+    if (data) {
+        mainId.value = data.id
+    }
+} 
+
+
+/* получение данных и фильтрация */
+const vacancies = ref([])
+const responses = ref([])
+const searchQuery = ref({
+  name: '',
+  exp: '',
+  salary: '',
+  format: ''
+})
+
+const fetchVacancies = async() => {
+    let query = supabase.from('vacancies').select().eq('status', 'Одобрена')
+    if(searchQuery.value.name) query = query.ilike('name', `%${searchQuery.value.name}%`)
+    if(searchQuery.value.exp) query = query.eq('exp', searchQuery.value.exp)
+    if(searchQuery.value.format) query = query.eq('format', searchQuery.value.format)
+    if(searchQuery.value.salary) query = query.qte('salary', searchQuery.value.salary)
+
+    const { data } = await query
+    vacancies.value = data || []
+}
+
+
+/* получение откликов и отправка */
+const fetchResponses = async () => {
+  const { data } = await supabase
+    .from('interactions')
+    .select('vacancy_id')
+    .eq('applicant_id', mainId.value)
+    .eq('type', 'response')
+  responses.value = data || []
+}
+
+const sendResponse = async (vacancyId) => {
+  const { data, error } = await supabase.from('interactions').insert({
+    type: 'response',
+    vacancy_id: vacancyId,
+    applicant_id: mainId.value,
+    employer_id: (await supabase.from('vacancies').select('employer_id').eq('id', vacancyId).single()).data.employer_id,
+  })
+
+    if (!error) {
+        showMessage('Заявка отправлена!', true)
+        await fetchResponses()
+    } else {
+        showMessage('Произошла ошибка!', false)
+    }
+
+}
+
+const isResponded = (id) => responses.value.some(r => r.vacancy_id === id)
+
+
+/* первоначальная загрузка */
+onMounted(async () => {
+    await fetchProfileData(role, userId)
+    await fetchVacancies()
+    await fetchResponses()
+})
+
+</script>
