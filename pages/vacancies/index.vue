@@ -1,20 +1,40 @@
 <template>
-    <div>
-        <div class="flex flex-col gap-6">
-            <p class="mainHeading">Список вакансий</p>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="flex flex-col gap-4 p-4 rounded-xl shadow-lg bg-white" v-for="vacancy in vacancies">
-                    <NuxtLink to="/" class="cursor-pointer self-end transition-all duration-500 hover:scale-110">
-                        <Icon class="text-3xl text-indigo-500" name="material-symbols:eye-tracking-rounded"/>
-                    </NuxtLink>
-                    <p>{{ vacancy.name }}</p>
-                    <p class="line-clamp-2">{{ vacancy.desc }}</p>
-                    <p><span class="font-semibold font-mono">Опыт: </span>{{ vacancy.exp }}</p>
-                    <p><span class="font-semibold font-mono">График: </span>{{ vacancy.schedule }}</p>
-                    <p><span class="font-semibold font-mono">Зарплата: </span>{{ vacancy.salary.toLocaleString() }} ₽</p>
-                    <button @click="sendResponse(vacancy.id)" :class="[isResponded(vacancy.id) ? 'opacity-50' : 'cursor-pointer hover:bg-transparent hover:text-indigo-500']" :disabled="isResponded(vacancy.id)" class="w-full py-1.5 px-4 rounded-xl border border-indigo-500 bg-indigo-500 text-white transition-all duration-500">{{ isResponded(vacancy.id) ? 'Отклик отправлен' : 'Откликнуться' }}</button>
-                </div>
+    <div class="flex flex-col gap-6">
+        <p class="mainHeading">Фильтрация</p>
+        <FormKit v-model="searchQuery.name" messages-class="text-[#E9556D] font-mono" type="text"
+            placeholder="Наименование вакансии" name="Наименование вакансии" outer-class="w-full"
+            input-class="focus:outline-none px-4 py-2 bg-white rounded-xl border border-transparent w-full transition-all duration-500 focus:border-indigo-500 shadow-md" />
+
+    </div>
+    <div class="flex flex-col gap-6" v-if="vacancies && vacancies.length > 0">
+        <p class="mainHeading">Список вакансий</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="flex flex-col gap-4 p-4 rounded-xl shadow-lg bg-white" v-for="vacancy in vacancies">
+                <NuxtLink to="/" class="cursor-pointer self-end transition-all duration-500 hover:scale-110">
+                    <Icon class="text-3xl text-indigo-500" name="material-symbols:eye-tracking-rounded" />
+                </NuxtLink>
+                <p>{{ vacancy.name }}</p>
+                <p class="line-clamp-2">{{ vacancy.desc }}</p>
+                <p><span class="font-semibold font-mono">Опыт: </span>{{ vacancy.exp }}</p>
+                <p><span class="font-semibold font-mono">График: </span>{{ vacancy.schedule }}</p>
+                <p><span class="font-semibold font-mono">Зарплата: </span>{{ vacancy.salary.toLocaleString() }} ₽</p>
+                <button @click="sendResponse(vacancy.id)"
+                    :class="[isResponded(vacancy.id) ? 'opacity-50' : 'cursor-pointer hover:bg-transparent hover:text-indigo-500']"
+                    :disabled="isResponded(vacancy.id)"
+                    class="w-full py-1.5 px-4 rounded-xl border border-indigo-500 bg-indigo-500 text-white transition-all duration-500">{{
+                        isResponded(vacancy.id) ? 'Отклик отправлен' : 'Откликнуться' }}</button>
             </div>
+        </div>
+    </div>
+    <div class="flex flex-col gap-6 items-center text-center" v-else>
+        <p class="mainHeading">Не найдено ни одной вакансии</p>
+        <div class="flex items-center gap-4 max-md:flex-col w-full md:w-2/3">
+            <button @click="cancelFilters"
+                class="cursor-pointer w-full md:w-1/2 py-1.5 px-4 rounded-xl text-white bg-indigo-500 border border-indigo-500 transition-all duration-500 hover:bg-transparent hover:text-indigo-500">Сбросить
+                фильтры</button>
+            <NuxtLink to="/"
+                class="w-full md:w-1/2 py-1.5 px-4 rounded-xl hover:text-white hover:bg-indigo-500 border border-indigo-500 transition-all duration-500 bg-transparent text-indigo-500">
+                Вернуться на главную</NuxtLink>
         </div>
     </div>
 </template>
@@ -49,48 +69,64 @@ const fetchProfileData = async (userRole, userId) => {
     if (data) {
         mainId.value = data.id
     }
-} 
+}
 
 
 /* получение данных и фильтрация */
 const vacancies = ref([])
 const responses = ref([])
 const searchQuery = ref({
-  name: '',
-  exp: '',
-  salary: '',
-  format: ''
+    name: '',
+    exp: '',
+    salary: '',
+    format: ''
 })
 
-const fetchVacancies = async() => {
+const fetchVacancies = async () => {
     let query = supabase.from('vacancies').select().eq('status', 'Одобрена')
-    if(searchQuery.value.name) query = query.ilike('name', `%${searchQuery.value.name}%`)
-    if(searchQuery.value.exp) query = query.eq('exp', searchQuery.value.exp)
-    if(searchQuery.value.format) query = query.eq('format', searchQuery.value.format)
-    if(searchQuery.value.salary) query = query.qte('salary', searchQuery.value.salary)
+    if (searchQuery.value.name) query = query.ilike('name', `%${searchQuery.value.name}%`)
+    if (searchQuery.value.exp) query = query.eq('exp', searchQuery.value.exp)
+    if (searchQuery.value.format) query = query.eq('format', searchQuery.value.format)
+    if (searchQuery.value.salary) query = query.qte('salary', searchQuery.value.salary)
 
     const { data } = await query
     vacancies.value = data || []
 }
 
+// фильтрация
+watch(searchQuery.value, (newValue, oldValue) => {
+    fetchVacancies()
+})
+
+// отмена фильтрации
+const cancelFilters = () => {
+    searchQuery.value = {
+        name: '',
+        exp: '',
+        salary: '',
+        format: ''
+    }
+    fetchVacancies()
+}
+
 
 /* получение откликов и отправка */
 const fetchResponses = async () => {
-  const { data } = await supabase
-    .from('interactions')
-    .select('vacancy_id')
-    .eq('applicant_id', mainId.value)
-    .eq('type', 'response')
-  responses.value = data || []
+    const { data } = await supabase
+        .from('interactions')
+        .select('vacancy_id')
+        .eq('applicant_id', mainId.value)
+        .eq('type', 'response')
+    responses.value = data || []
 }
 
 const sendResponse = async (vacancyId) => {
-  const { data, error } = await supabase.from('interactions').insert({
-    type: 'response',
-    vacancy_id: vacancyId,
-    applicant_id: mainId.value,
-    employer_id: (await supabase.from('vacancies').select('employer_id').eq('id', vacancyId).single()).data.employer_id,
-  })
+    const { data, error } = await supabase.from('interactions').insert({
+        type: 'response',
+        vacancy_id: vacancyId,
+        applicant_id: mainId.value,
+        employer_id: (await supabase.from('vacancies').select('employer_id').eq('id', vacancyId).single()).data.employer_id,
+    })
 
     if (!error) {
         showMessage('Заявка отправлена!', true)
