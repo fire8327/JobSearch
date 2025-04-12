@@ -7,7 +7,7 @@
                 input-class="focus:outline-none px-4 py-2 bg-white rounded-xl border border-transparent w-full transition-all duration-500 focus:border-indigo-500 shadow-md" />
             <div class="flex items-center lg:items-start gap-4 max-lg:flex-col w-full md:w-2/3 lg:w-1/2">
                 <FormKit v-model="searchQuery.exp" type="select" :options="['Без опыта', 'До 1 года', '1-3 года', '3-5 лет', 'Более 5 лет']" placeholder="Опыт работы" name="Опыт работы" outer-class="w-full lg:w-1/3" input-class="focus:outline-none px-4 py-2 bg-white rounded-xl border border-transparent w-full transition-all duration-500 focus:border-indigo-500 shadow-md"/>
-                <FormKit v-model="searchQuery.schedule" validation="required" messages-class="text-[#E9556D] font-mono" type="select" :options="['5/2', '6/1', '2/2', '1/2', '1/3', 'Неделя через неделю', 'Дежурства', 'Гибкий график']" placeholder="График" name="График" outer-class="w-full md:w-2/3 lg:w-1/2" input-class="focus:outline-none px-4 py-2 bg-white rounded-xl border border-transparent w-full transition-all duration-500 focus:border-indigo-500 shadow-md"/>
+                <FormKit v-model="searchQuery.schedule" type="select" :options="['5/2', '6/1', '2/2', '1/2', '1/3', 'Неделя через неделю', 'Дежурства', 'Гибкий график']" placeholder="График" name="График" outer-class="w-full md:w-2/3 lg:w-1/2" input-class="focus:outline-none px-4 py-2 bg-white rounded-xl border border-transparent w-full transition-all duration-500 focus:border-indigo-500 shadow-md"/>
                 <FormKit v-model="searchQuery.format" type="select" :options="['Удалённый', 'Офис', 'Гибрид', 'Вахта', 'Проектный']" placeholder="Формат" name="Формат" outer-class="w-full lg:w-1/3" input-class="focus:outline-none px-4 py-2 bg-white rounded-xl border border-transparent w-full transition-all duration-500 focus:border-indigo-500 shadow-md"/>
             </div>
         </div>
@@ -16,7 +16,7 @@
         <p class="mainHeading">Список вакансий</p>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="flex flex-col gap-4 p-4 rounded-xl shadow-lg bg-white" v-for="vacancy in vacancies">
-                <NuxtLink to="/" class="cursor-pointer self-end transition-all duration-500 hover:scale-110">
+                <NuxtLink :to="`/vacancies/vacancy-${vacancy.id}`" class="cursor-pointer self-end transition-all duration-500 hover:scale-110">
                     <Icon class="text-3xl text-indigo-500" name="material-symbols:eye-tracking-rounded" />
                 </NuxtLink>
                 <p>{{ vacancy.name }}</p>
@@ -57,7 +57,7 @@ const userStore = useUserStore()
 const { id: userId, role } = userStore
 
 
-/* определени id отправившего */
+/* определение id отправившего */
 const mainId = ref() // id в зависимости от роли
 const roleTableMap = { // таблица в зависимости от роли
     employer: 'employers',
