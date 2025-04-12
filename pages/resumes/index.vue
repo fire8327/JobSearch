@@ -19,7 +19,6 @@
                     <Icon class="text-3xl text-indigo-500" name="material-symbols:eye-tracking-rounded" />
                 </NuxtLink>
                 <p>{{ resume.name }}</p>
-                <p class="line-clamp-2">{{ resume.desc }}</p>
                 <p><span class="font-semibold font-mono">Опыт: </span>{{ resume.exp }}</p>
                 <p><span class="font-semibold font-mono">Образование: </span>{{ resume.education }}</p>
                 <p><span class="font-semibold font-mono">Зарплата: </span>{{ resume.salary.toLocaleString() }} ₽</p>
@@ -27,7 +26,7 @@
                     :class="[isOffered(resume.id) ? 'opacity-50' : 'cursor-pointer hover:bg-transparent hover:text-indigo-500']"
                     :disabled="isOffered(resume.id)"
                     class="w-full py-1.5 px-4 rounded-xl border border-indigo-500 bg-indigo-500 text-white transition-all duration-500">{{
-                        isOffered(resume.id) ? 'Отклик отправлен' : 'Откликнуться' }}</button>
+                        isOffered(resume.id) ? 'Предложение отправлено' : 'Предложить работу' }}</button>
             </div>
         </div>
     </div>
@@ -117,19 +116,25 @@ const fetchOffers = async () => {
   const { data } = await supabase
     .from('interactions')
     .select('resume_id')
-    .eq('employer_id', userStore.employerId)
+    .eq('employer_id', mainId.value)
     .eq('type', 'offer')
   offers.value = data || []
 }
 
 const sendOffer = async (resumeId) => {
-  await supabase.from('interactions').insert({
+  const { data, error } = await supabase.from('interactions').insert({
     type: 'offer',
     resume_id: resumeId,
-    employer_id: userStore.employerId,
+    employer_id: mainId.value,
     applicant_id: (await supabase.from('resumes').select('applicant_id').eq('id', resumeId).single()).data.applicant_id,
   })
-  await fetchOffers()
+
+    if (!error) {
+        showMessage('Предложение отправлено!', true)
+        await fetchOffers()
+    } else {
+        showMessage('Произошла ошибка!', false)
+    }
 }
 
 const isOffered = (id) => offers.value.some(o => o.resume_id === id)
