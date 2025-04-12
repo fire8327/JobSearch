@@ -86,7 +86,7 @@ const searchQuery = ref({
 })
 
 const fetchResumes = async () => {
-  let query = supabase.from('resumes').select('*')
+  let query = supabase.from('resumes').select('*').eq('status', 'Одобрено')
   if (searchQuery.value.name) query = query.ilike('name', `%${searchQuery.value.name}%`)
   if (searchQuery.value.exp) query = query.eq('exp', searchQuery.value.exp)
   if (searchQuery.value.education) query = query.eq('education', searchQuery.value.education)
