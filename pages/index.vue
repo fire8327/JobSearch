@@ -3,13 +3,33 @@
         <img src="/images/hero/main.jpg" alt="" class="w-full aspect-video object-cover object-center max-md:aspect-[7/11]">
         <div class="absolute inset-0 bg-black/30"></div>
         <div class="absolute inset-0 py-10 px-4 flex justify-center items-center text-center text-white">
-            <div class="flex flex-col items-center relative gap-6 w-fit p-4 lg:p-6 max-w-2xl">
+            <div v-if="role === 'applicant'" class="flex flex-col items-center relative gap-6 w-fit p-4 lg:p-6 max-w-2xl">
                 <div class="absolute inset-0 backdrop-blur-md rounded-xl"></div>
                 <p class="text-3xl font-mono font-semibold z-[1] max-w-lg">Работа, которая легко встраивается в жизнь</p>
                 <p class="opacity-70 text-lg tracking-wide z-[1] max-w-xl">
                     Ищете занятие, которое не будет мешать личному времени, семье и увлечениям? 
                 </p>
-                <NuxtLink to="/" class="bg-indigo-500 text-white rounded-lg z-[1] py-1.5 px-4 transition-all duration-500 hover:opacity-70">Смотреть вакансии</NuxtLink>
+                <NuxtLink to="/vacancies" class="bg-indigo-500 text-white rounded-lg z-[1] py-1.5 px-4 transition-all duration-500 hover:opacity-70">Смотреть вакансии</NuxtLink>
+            </div>
+            <div v-if="role === 'employer'" class="flex flex-col items-center relative gap-6 w-fit p-4 lg:p-6 max-w-2xl">
+                <div class="absolute inset-0 backdrop-blur-md rounded-xl"></div>
+                <p class="text-3xl font-mono font-semibold z-[1] max-w-lg">Найдите идеальных сотрудников для вашей команды</p>
+                <p class="opacity-70 text-lg tracking-wide z-[1] max-w-xl">
+                    Ищете профессионалов, которые разделяют ценности вашей компании и готовы внести вклад в её успех?
+                </p>
+                <NuxtLink to="/resumes" class="bg-indigo-500 text-white rounded-lg z-[1] py-1.5 px-4 transition-all duration-500 hover:opacity-70">
+                    Смотреть резюме
+                </NuxtLink>
+            </div>
+            <div v-if="role === 'admin'" class="flex flex-col items-center relative gap-6 w-fit p-4 lg:p-6 max-w-2xl">
+                <div class="absolute inset-0 backdrop-blur-md rounded-xl"></div>
+                <p class="text-3xl font-mono font-semibold z-[1] max-w-lg">Управляйте платформой с лёгкостью</p>
+                <p class="opacity-70 text-lg tracking-wide z-[1] max-w-xl">
+                    Контролируйте вакансии, резюме и пользователей, чтобы платформа работала безупречно.
+                </p>
+                <NuxtLink to="/admin" class="bg-indigo-500 text-white rounded-lg z-[1] py-1.5 px-4 transition-all duration-500 hover:opacity-70">
+                    Админ-панель
+                </NuxtLink>
             </div>
         </div>
     </div>
@@ -66,5 +86,6 @@
 </template>
 
 <script setup>
-
+/* получение роли */
+const { role } = useUserStore()
 </script>
