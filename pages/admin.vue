@@ -10,7 +10,7 @@
                     <button type="button" @click="updateVacancyStatus(vacancy.id, 'Одобрена')" :disabled="vacancyUpdating[vacancy.id]" class="cursor-pointer">
                         <Icon class="text-3xl text-green-500" name="material-symbols:check-rounded"/>
                     </button>
-                    <button type="button" @click="updateVacancyStatus(vacancy.id, '')" :disabled="vacancyUpdating[vacancy.id]" class="cursor-pointer">
+                    <button type="button" @click="updateVacancyStatus(vacancy.id, 'Отклонена')" :disabled="vacancyUpdating[vacancy.id]" class="cursor-pointer">
                         <Icon class="text-3xl text-red-500" name="material-symbols:close-small-outline-rounded"/>
                     </button>
                 </div>
@@ -26,10 +26,10 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" v-if="resumes && resumes.length > 0">
             <div class="flex flex-col gap-4 p-4 rounded-xl bg-white shadow-lg" v-for="resume in resumes" :key="resume.id">
                 <div class="flex items-center gap-2 self-end" v-if="resume.status === 'На проверке'">
-                    <button type="button" @click="updateVacancyStatus(resume.id, 'Одобрена')" :disabled="resumeUpdating[resume.id]" class="cursor-pointer">
+                    <button type="button" @click="updateResumeStatus(resume.id, 'Одобрено')" :disabled="resumeUpdating[resume.id]" class="cursor-pointer">
                         <Icon class="text-3xl text-green-500" name="material-symbols:check-rounded"/>
                     </button>
-                    <button type="button" @click="updateVacancyStatus(resume.id, '')" :disabled="resumeUpdating[resume.id]" class="cursor-pointer">
+                    <button type="button" @click="updateResumeStatus(resume.id, 'Отклонено')" :disabled="resumeUpdating[resume.id]" class="cursor-pointer">
                         <Icon class="text-3xl text-red-500" name="material-symbols:close-small-outline-rounded"/>
                     </button>
                 </div>
@@ -163,6 +163,8 @@ const deleteUser = async (id) => {
     if (error) throw error
     showMessage('Пользователь удалён!', true)
     await fetchUsers()
+    await fetchVacancies()
+    await fetchResumes()
   } catch (error) {
     console.error('Ошибка удаления пользователя:', error.message)
   } finally {
