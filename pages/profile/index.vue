@@ -92,6 +92,40 @@
             </div>
         </div>
     </div>
+    <div class="flex flex-col gap-6" v-if="role === 'applicant'">
+        <p class="mainHeading">Мои отклики</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" v-if="responses && responses.length > 0">
+            <div class="flex flex-col gap-4 p-4 rounded-xl bg-white shadow-lg" v-for="response in responses" :key="response.id">
+                <button type="button" @click="cancelResponse(response.id)" class="cursor-pointer self-end" v-if="response.status === 'На рассмотрении'">
+                    <Icon class="text-3xl text-red-500" name="material-symbols:delete-outline"/>
+                </button>
+                <p><span class="font-semibold font-mono">Вакансия:</span> {{ response.vacancy.name }}</p>
+                <p><span class="font-semibold font-mono">Статус:</span> {{ response.status }}</p>
+            </div>
+        </div>
+        <div v-else class="flex flex-col w-full items-center gap-4 text-center">
+            <p class="text-2xl font-semibold font-mono">Вы пока не отправляли отклики</p>
+            <NuxtLink to="/vacancies" class="px-4 py-2 border border-indigo-500 bg-indigo-500 text-white rounded-full text-center transition-all duration-500 hover:text-indigo-500 hover:bg-transparent">Отправить отклик</NuxtLink>
+        </div>
+    </div>
+    <div class="flex flex-col gap-6" v-if="role === 'applicant'">
+        <p class="mainHeading">Полученные предложения</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" v-if="offers && offers.length > 0">
+            <div class="flex flex-col gap-4 p-4 rounded-xl bg-white shadow-lg" v-for="offer in offers" :key="offer.id">
+                <div class="flex items-center gap-2 self-end" v-if="offer.status === 'На рассмотрении'">
+                    <button type="button" @click="acceptOffer(offer.id)" class="cursor-pointer">
+                        <Icon class="text-3xl text-green-500" name="material-symbols:check-rounded"/>
+                    </button>
+                    <button type="button" @click="rejectOffer(offer.id)" class="cursor-pointer">
+                        <Icon class="text-3xl text-red-500" name="material-symbols:close-small-outline-rounded"/>
+                    </button>
+                </div>
+                <p><span class="font-semibold font-mono">От:</span> {{ offer.employer.companyName }}</p>
+                <p><span class="font-semibold font-mono">Статус:</span> {{ offer.status }}</p>
+            </div>
+        </div>
+        <p v-else class="text-2xl font-semibold font-mono text-center">Нет предложений</p>
+    </div>
     <div class="flex flex-col gap-6">
         <p class="mainHeading">Выход</p>
         <button @click="logout" class="px-4 py-2 border border-indigo-500 bg-indigo-500 text-white rounded-full w-[160px] text-center transition-all duration-500 hover:text-indigo-500 hover:bg-transparent">Выйти</button>
@@ -423,6 +457,68 @@
     }
 
 
+    /* управление откликами и предложениями */
+    const responses = ref([])
+    const offers = ref([])
+
+    // фукнции для получения
+    const fetchResponses = async () => {
+    const { data } = await supabase
+        .from('interactions')
+        .select('*, vacancy:vacancies(name), applicant:applicants(name, surname)')
+        .eq(role === 'applicant' ? 'applicant_id' : 'employer_id', mainId.value)
+        .eq('type', 'response')
+        responses.value = data || []
+    }
+
+    const fetchOffers = async () => {
+    const { data } = await supabase
+        .from('interactions')
+        .select('*, resume:resumes(name), employer:employers(companyName)')
+        .eq(role === 'applicant' ? 'applicant_id' : 'employer_id', mainId.value)
+        .eq('type', 'offer')
+        offers.value = data || []
+    }
+
+    // функции для обработки
+
+    const cancelResponse = async (id) => {
+        await supabase.from('interactions').delete().eq('id', id)
+        showMessage('Заявка удалена!', true)
+        await fetchResponses()
+    }
+
+    const acceptOffer = async (id) => {
+        await supabase.from('interactions').update({ status: 'Одобрено' }).eq('id', id)
+        showMessage('Предложение одобрено!', true)
+        await fetchOffers()
+    }
+
+    const rejectOffer = async (id) => {
+        await supabase.from('interactions').update({ status: 'Отклонено' }).eq('id', id)
+        showMessage('Предложение отклонено!', true)
+        await fetchOffers()
+    }
+
+    const acceptResponse = async (id) => {
+        await supabase.from('interactions').update({ status: 'Одобрена' }).eq('id', id)
+        showMessage('Заявка одобрена!', true)
+        await fetchResponses()
+    }
+
+    const rejectResponse = async (id) => {
+        await supabase.from('interactions').update({ status: 'Отклонена' }).eq('id', id)
+        showMessage('Заявка отклонена!', true)
+        await fetchResponses()
+    }
+
+    const cancelOffer = async (id) => {
+        await supabase.from('interactions').delete().eq('id', id)
+        showMessage('Заявка удалена!', true)
+        await fetchOffers()
+    }
+
+
     /* первоначальная загрузка */
     onMounted(async () => {
         loadProfileData()
@@ -430,5 +526,9 @@
         await fetchProfileData(role, userId)
         await getVacanciesData()
         await getResumesData()
+        if (userStore.profileCompleted) {
+            await fetchResponses()
+            await fetchOffers()
+        }
     })
 </script>
