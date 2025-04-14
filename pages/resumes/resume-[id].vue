@@ -32,6 +32,13 @@
 </template>
 
 <script setup>
+/* название и язык страницы */
+useSeoMeta({
+    title: 'Страница резюме',
+    lang: 'ru'
+})
+
+
 /* получение id товара и сообщения */
 const route = useRoute()
 const { showMessage } = useMessagesStore()

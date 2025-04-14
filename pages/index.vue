@@ -86,6 +86,13 @@
 </template>
 
 <script setup>
+/* название и язык страницы */
+useSeoMeta({
+    title: 'Главная',
+    lang: 'ru'
+})
+
+
 /* получение роли */
 const { role } = useUserStore()
 </script>

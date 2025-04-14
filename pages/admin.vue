@@ -60,6 +60,13 @@
 </template>
 
 <script setup>
+/* название и язык страницы */
+useSeoMeta({
+    title: 'Админ-панель',
+    lang: 'ru'
+})
+
+
 /* подключение сообщений */
 const { showMessage } = useMessagesStore()
 

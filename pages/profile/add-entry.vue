@@ -41,6 +41,13 @@
 </template>
 
 <script setup>
+    /* название и язык страницы */
+    useSeoMeta({
+        title: 'Добавление записи',
+        lang: 'ru'
+    })
+
+
     /* создание роутера */
     const router = useRouter()
 

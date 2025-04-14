@@ -170,6 +170,13 @@
 </template>
 
 <script setup>
+    /* название и язык страницы */
+    useSeoMeta({
+        title: 'Профиль',
+        lang: 'ru'
+    })
+
+
     /* проверка роли и создание сообщений */
     const userStore = useUserStore()
     const { id:userId, role, updateProfileCompleted, logout } = useUserStore()

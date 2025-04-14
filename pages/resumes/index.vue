@@ -44,6 +44,13 @@
 </template>
 
 <script setup>
+/* название и язык страницы */
+useSeoMeta({
+    title: 'Резюме',
+    lang: 'ru'
+})
+
+
 /* подключение сообщений */
 const { showMessage } = useMessagesStore()
 
