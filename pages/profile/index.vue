@@ -51,7 +51,7 @@
                     <button type="button" @click="deleteVacancy(vacancy.id)" class="cursor-pointer self-end">
                         <Icon class="text-3xl text-red-500" name="material-symbols:delete-outline"/>
                     </button>
-                    <p>{{ vacancy.name }}</p>
+                    <p class="mt-auto">{{ vacancy.name }}</p>
                     <p class="line-clamp-2">{{ vacancy.desc }}</p>
                     <p><span class="font-semibold font-mono">Опыт: </span>{{ vacancy.exp }}</p>
                     <p><span class="font-semibold font-mono">График: </span>{{ vacancy.schedule }}</p>
@@ -75,7 +75,7 @@
                     <button type="button" @click="deleteResume(resume.id)" class="cursor-pointer self-end">
                         <Icon class="text-3xl text-red-500" name="material-symbols:delete-outline"/>
                     </button>
-                    <p>{{ resume.name }}</p>
+                    <p class="mt-auto">{{ resume.name }}</p>
                     <p><span class="font-semibold font-mono">Опыт: </span>{{ resume.exp }}</p>
                     <p><span class="font-semibold font-mono">Образование: </span>{{ resume.education }}</p>
                     <p><span class="font-semibold font-mono">Статус: </span>{{ resume.status }}</p>
@@ -99,7 +99,7 @@
                 <button type="button" @click="cancelResponse(response.id)" class="cursor-pointer self-end" v-if="response.status === 'На рассмотрении'">
                     <Icon class="text-3xl text-red-500" name="material-symbols:delete-outline"/>
                 </button>
-                <p><span class="font-semibold font-mono">Вакансия:</span> {{ response.vacancy.name }}</p>
+                <p class="mt-auto"><span class="font-semibold font-mono">Вакансия:</span> {{ response.vacancy.name }}</p>
                 <p><span class="font-semibold font-mono">Статус:</span> {{ response.status }}</p>
             </div>
         </div>
@@ -120,7 +120,7 @@
                         <Icon class="text-3xl text-red-500" name="material-symbols:close-small-outline-rounded"/>
                     </button>
                 </div>
-                <p><span class="font-semibold font-mono">От:</span> {{ offer.employer.companyName }}</p>
+                <p class="mt-auto"><span class="font-semibold font-mono">От:</span> {{ offer.employer.companyName }}</p>
                 <p><span class="font-semibold font-mono">Статус:</span> {{ offer.status }}</p>
             </div>
         </div>
@@ -133,7 +133,7 @@
                 <button type="button" @click="cancelOffer(offer.id)" class="cursor-pointer self-end" v-if="offer.status === 'На рассмотрении'">
                     <Icon class="text-3xl text-red-500" name="material-symbols:delete-outline"/>
                 </button>
-                <p><span class="font-semibold font-mono">Резюме:</span> {{ offer.resume.name }}</p>
+                <p class="mt-auto"><span class="font-semibold font-mono">Резюме:</span> {{ offer.resume.name }}</p>
                 <p><span class="font-semibold font-mono">Статус:</span> {{ offer.status }}</p>
                 <a v-if="offer.resume.resume" :href="`https://unhdwdwoeepepaliejow.supabase.co/storage/v1/object/public/files/resumes/${offer.resume.resume}`" download="Резюме соискателя" target="_blank" class="font-semibold font-mono w-fit flex flex-col after:w-0 after:h-[3px] after:rounded-full after:bg-[#141414]/80 after:transition-all after:duration-500 hover:after:w-full">Скачать резюме</a> 
                 <p v-else class="font-semibold font-mono">Ошибка: резюме не загружено</p>
@@ -156,8 +156,9 @@
                         <Icon class="text-3xl text-red-500" name="material-symbols:close-small-outline-rounded"/>
                     </button>
                 </div>
-                <p><span class="font-semibold font-mono">Вакансия:</span> {{ response.vacancy.name }}</p>
+                <p class="mt-auto"><span class="font-semibold font-mono">Вакансия:</span> {{ response.vacancy.name }}</p>
                 <p><span class="font-semibold font-mono">Соискатель:</span> {{ response.applicant.surname }} {{ response.applicant.name }}</p>
+                <p><span class="font-semibold font-mono">Телефон:</span> {{ response.applicant.phone }}</p>
                 <p><span class="font-semibold font-mono">Статус:</span> {{ response.status }}</p>
             </div>
         </div>
@@ -509,7 +510,7 @@
     const fetchResponses = async () => {
     const { data } = await supabase
         .from('interactions')
-        .select('*, vacancy:vacancies(name), applicant:applicants(name, surname)')
+        .select('*, vacancy:vacancies(name), applicant:applicants(name, surname, phone)')
         .eq(role === 'applicant' ? 'applicant_id' : 'employer_id', mainId.value)
         .eq('type', 'response')
         responses.value = data || []
