@@ -7,15 +7,15 @@
         </div>
         <FormKit v-model="user.email" validation="required|email" messages-class="text-[#E9556D] font-mono" type="text" placeholder="Email" name="Email" outer-class="w-full md:w-2/3 lg:w-1/2" input-class="focus:outline-none px-4 py-2 bg-white rounded-xl border border-transparent w-full transition-all duration-500 focus:border-indigo-500 shadow-md"/>
         <div class="flex max-md:flex-col items-center w-full md:w-2/3 lg:w-1/2 gap-4">
-            <div @click="user.role = 'applicant'" class="cursor-pointer flex items-center gap-2 p-4 rounded-lg transition-all duration-500 w-full md:w-1/2 border shadow-md" :class="[user.role === 'applicant' ? 'border-indigo-500 bg-indigo-50' : 'bg-white border-transparent hover:bg-gray-100']">
-                <Icon class="text-3xl text-indigo-500" name="ic:baseline-man"/>
+            <div @click="user.role = 'applicant'" class="cursor-pointer flex items-center gap-2 p-4 rounded-lg transition-all duration-500 w-full md:w-1/2 border-[2px] shadow-md bg-[#141414]/95 text-white" :class="[user.role === 'applicant' ? 'border-indigo-500' : 'border-transparent hover:bg-gray-100']">
+                <Icon class="text-3xl" name="ic:baseline-man" :class="[user.role === 'applicant' ? 'text-indigo-500' : 'text-white']"/>
                 <div class="flex flex-col gap-1">
                     <p class="font-semibold">Соискатель</p>
                     <p class="text-sm">Ищу работу</p>
                 </div>
             </div>
-            <div @click="user.role = 'employer'" class="cursor-pointer flex items-center gap-2 p-4 rounded-lg transition-all duration-500 w-full md:w-1/2 border shadow-md" :class="[user.role === 'employer' ? 'border-indigo-500 bg-indigo-50' : 'bg-white border-transparent hover:bg-gray-100']">
-                <Icon class="text-3xl text-indigo-500" name="hugeicons:permanent-job"/>
+            <div @click="user.role = 'employer'" class="cursor-pointer flex items-center gap-2 p-4 rounded-lg transition-all duration-500 w-full md:w-1/2 border-[2px] shadow-md bg-[#141414]/95 text-white" :class="[user.role === 'employer' ? 'border-indigo-500' : 'border-transparent hover:bg-gray-100']">
+                <Icon class="text-3xl" name="hugeicons:permanent-job" :class="[user.role === 'employer' ? 'text-indigo-500' : 'text-white']"/>
                 <div class="flex flex-col gap-1">
                     <p class="font-semibold">Работодатель</p>
                     <p class="text-sm">Ищу сотрудников</p>
