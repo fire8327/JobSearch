@@ -5,7 +5,7 @@
     <div v-if="role === 'admin'" class="flex flex-col gap-6">
         <p class="mainHeading">Вакансии</p>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" v-if="vacancies && vacancies.length > 0">
-            <div class="flex flex-col gap-4 p-4 rounded-xl bg-white shadow-lg" v-for="vacancy in vacancies" :key="vacancy.id">
+            <div class="flex flex-col gap-4 p-4 rounded-xl bg-[#141414]/95 text-white shadow-lg" v-for="vacancy in vacancies" :key="vacancy.id">
                 <div class="flex items-center gap-2 self-end" v-if="vacancy.status === 'На проверке'">
                     <button type="button" @click="updateVacancyStatus(vacancy.id, 'Одобрена')" :disabled="vacancyUpdating[vacancy.id]" class="cursor-pointer">
                         <Icon class="text-3xl text-green-500" name="material-symbols:check-rounded"/>
@@ -24,7 +24,7 @@
     <div v-if="role === 'admin'" class="flex flex-col gap-6">
         <p class="mainHeading">Резюме</p>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" v-if="resumes && resumes.length > 0">
-            <div class="flex flex-col gap-4 p-4 rounded-xl bg-white shadow-lg" v-for="resume in resumes" :key="resume.id">
+            <div class="flex flex-col gap-4 p-4 rounded-xl bg-[#141414]/95 text-white shadow-lg" v-for="resume in resumes" :key="resume.id">
                 <div class="flex items-center gap-2 self-end" v-if="resume.status === 'На проверке'">
                     <button type="button" @click="updateResumeStatus(resume.id, 'Одобрено')" :disabled="resumeUpdating[resume.id]" class="cursor-pointer">
                         <Icon class="text-3xl text-green-500" name="material-symbols:check-rounded"/>
@@ -44,7 +44,7 @@
         <p class="mainHeading">Пользователи</p>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" v-if="users && users.length > 0">
             <template v-for="user in users">
-                <div class="flex flex-col gap-4 p-4 rounded-xl bg-white shadow-lg" v-if="user.role !== 'admin'" :key="user.id">
+                <div class="flex flex-col gap-4 p-4 rounded-xl bg-[#141414]/95 text-white shadow-lg" v-if="user.role !== 'admin'" :key="user.id">
                     <button type="button" @click="deleteUser(user.id)" :disabled="userDeleting[user.id]" class="cursor-pointer self-end">
                         <Icon class="text-3xl text-red-500" name="material-symbols:delete-outline"/>
                     </button>

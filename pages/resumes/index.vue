@@ -15,7 +15,7 @@
         <div class="flex flex-col gap-6" v-if="resumes && resumes.length > 0">
             <p class="mainHeading">Список резюме</p>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="flex flex-col gap-4 p-4 rounded-xl shadow-lg bg-white" v-for="resume in resumes">
+                <div class="flex flex-col gap-4 p-4 rounded-xl shadow-lg bg-[#141414]/95 text-white" v-for="resume in resumes">
                     <NuxtLink :to="`/resumes/resume-${resume.id}`" class="cursor-pointer self-end transition-all duration-500 hover:scale-110">
                         <Icon class="text-3xl text-indigo-500" name="material-symbols:eye-tracking-rounded" />
                     </NuxtLink>

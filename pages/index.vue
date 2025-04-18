@@ -46,25 +46,25 @@
     <div class="flex flex-col gap-6">
         <p class="mainHeading">Как начать работать</p>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="flex flex-col gap-6 rounded-xl bg-gray-200 p-4 items-center text-center">
-                <p class="px-8 py-1.5 text-3xl font-mono bg-indigo-500 text-white rounded-lg">1</p>
+            <div class="flex flex-col gap-6 rounded-xl bg-[#141414]/95 p-4 text-white items-center text-center">
+                <p class="px-8 py-1.5 text-3xl font-mono bg-indigo-500 rounded-lg">1</p>
                 <p class="text-2xl font-mono font-semibold">Отклик</p>
-                <p>Откликнитесь на вакансию</p>
+                <p class="opacity-70">Откликнитесь на вакансию</p>
             </div>
-            <div class="flex flex-col gap-6 rounded-xl bg-gray-200 p-4 items-center text-center">
-                <p class="px-8 py-1.5 text-3xl font-mono bg-indigo-500 text-white rounded-lg">2</p>
+            <div class="flex flex-col gap-6 rounded-xl bg-[#141414]/95 p-4 text-white items-center text-center">
+                <p class="px-8 py-1.5 text-3xl font-mono bg-indigo-500 rounded-lg">2</p>
                 <p class="text-2xl font-mono font-semibold">Отбор</p>
-                <p>Пройдите интервью и/или тестовое задание</p>
+                <p class="opacity-70">Пройдите интервью и/или тестовое задание</p>
             </div>
-            <div class="flex flex-col gap-6 rounded-xl bg-gray-200 p-4 items-center text-center">
-                <p class="px-8 py-1.5 text-3xl font-mono bg-indigo-500 text-white rounded-lg">3</p>
+            <div class="flex flex-col gap-6 rounded-xl bg-[#141414]/95 p-4 text-white items-center text-center">
+                <p class="px-8 py-1.5 text-3xl font-mono bg-indigo-500 rounded-lg">3</p>
                 <p class="text-2xl font-mono font-semibold">Оформление</p>
-                <p>Подпишите договор и другие документы</p>
+                <p class="opacity-70">Подпишите договор и другие документы</p>
             </div>
-            <div class="flex flex-col gap-6 rounded-xl bg-gray-200 p-4 items-center text-center">
-                <p class="px-8 py-1.5 text-3xl font-mono bg-indigo-500 text-white rounded-lg">4</p>
+            <div class="flex flex-col gap-6 rounded-xl bg-[#141414]/95 p-4 text-white items-center text-center">
+                <p class="px-8 py-1.5 text-3xl font-mono bg-indigo-500 rounded-lg">4</p>
                 <p class="text-2xl font-mono font-semibold">Работа</p>
-                <p>Пройдите обучение и начинайте работу</p>
+                <p class="opacity-70">Пройдите обучение и начинайте работу</p>
             </div>
         </div>
     </div>
