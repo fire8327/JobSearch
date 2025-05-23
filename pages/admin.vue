@@ -14,7 +14,7 @@
                         <Icon class="text-3xl text-red-500" name="material-symbols:close-small-outline-rounded"/>
                     </button>
                 </div>
-                <p><span class="font-semibold font-mono">{{ vacancy.name }}</span></p>
+                <p class="mt-auto"><span class="font-semibold font-mono">{{ vacancy.name }}</span></p>
                 <p><span class="font-semibold font-mono">Компания:</span>{{ vacancy?.employer?.companyName }}</p>
                 <p><span class="font-semibold font-mono">Статус:</span>{{ vacancy.status }}</p>
             </div>
@@ -33,7 +33,7 @@
                         <Icon class="text-3xl text-red-500" name="material-symbols:close-small-outline-rounded"/>
                     </button>
                 </div>
-                <p><span class="font-semibold font-mono">{{ resume.name }}</span></p>
+                <p class="mt-auto"><span class="font-semibold font-mono">{{ resume.name }}</span></p>
                 <p><span class="font-semibold font-mono">Соискатель:</span>{{ resume?.applicant?.surname }} {{ resume?.applicant?.name }}</p>
                 <p><span class="font-semibold font-mono">Статус:</span>{{ resume.status }}</p>
             </div>
@@ -48,8 +48,8 @@
                     <button type="button" @click="deleteUser(user.id)" :disabled="userDeleting[user.id]" class="cursor-pointer self-end">
                         <Icon class="text-3xl text-red-500" name="material-symbols:delete-outline"/>
                     </button>
-                    <p v-if="user.role === 'applicant'"><span class="font-semibold font-mono">Имя:</span> {{ user.applicant[0].surname }} {{ user.applicant[0].name }}</p>
-                    <p v-if="user.role === 'employer'"><span class="font-semibold font-mono">Компания:</span> {{ user.employer[0].companyName }}</p>
+                    <p class="mt-auto" v-if="user.role === 'applicant'"><span class="font-semibold font-mono">Имя:</span> {{ user.applicant[0].surname }} {{ user.applicant[0].name }}</p>
+                    <p class="mt-auto" v-if="user.role === 'employer'"><span class="font-semibold font-mono">Компания:</span> {{ user.employer[0].companyName }}</p>
                     <p><span class="font-semibold font-mono">Почта:</span> {{ user.email }}</p>
                     <p><span class="font-semibold font-mono">Роль:</span> {{ user.role }}</p>
                 </div>
